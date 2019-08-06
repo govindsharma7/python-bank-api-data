@@ -16,14 +16,11 @@ class GetBankBranches(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = BankInformation.objects.all()
-        if self.request.query_params.get('bank_name'):
-            bank_name = self.request.query_params.get('bank_name')
+        bank_name = self.request.query_params.get('bank_name', '')
+        city = self.request.query_params.get('city', '')
+        if bank_name and city:
             queryset = queryset.filter(
-                bank_name__iexact=bank_name
-            )
-        if self.request.query_params.get('city'):
-            city = self.request.query_params.get('city')
-            queryset = queryset.filter(
+                bank_name__iexact=bank_name,
                 city__iexact=city
             )
         return queryset
