@@ -15,6 +15,7 @@ gunicorn = "*"
 pandas = "*"
 django-heroku = "*"
 whitenoise = "*"
+ipdb = "*"
 
 [dev-packages]
 "flake8" = "*"

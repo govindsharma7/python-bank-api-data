@@ -1,36 +1,32 @@
-import os
-import pandas as pd
-
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 
 from bank_data.bank.models import BankInformation
 from bank_data.bank.serializers import BankInformationSerializer
 
 
-class GetBankBranches(ListAPIView):
+class GetBankBranches(generics.ListAPIView):
+    model = BankInformation
+    permission_classes = (IsAuthenticated,)
     serializer_class = BankInformationSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = (IsAuthenticated,)
 
-    def get(self, request):
-        queryset = BankInformation.objects.get_branches(
-            bank_name__iexact=request.query.get('bank_name', ''),
-            city__iexact=request.query.get('city', '')
-        )
-        page = self.paginate_queryset(queryset)
-        if page:
-            ser_res = self.get_serializer(page, many=True)
-            return self.get_paginated_response(ser_res.data)
-        ser_res = self.get_serializer(queryset, many=True)
-        return Response({
-            'status': 'success',
-            'results': ser_res.data
-        }, status=status.HTTP_200_OK)
+    def get_queryset(self):
+        queryset = BankInformation.objects.all()
+        if self.request.query_params.get('bank_name'):
+            bank_name = self.request.query_params.get('bank_name')
+            queryset = queryset.filter(
+                bank_name__iexact=bank_name
+            )
+        if self.request.query_params.get('city'):
+            city = self.request.query_params.get('city')
+            queryset = queryset.filter(
+                city__iexact=city
+            )
+        return queryset
 
 
 @api_view(['GET'])
