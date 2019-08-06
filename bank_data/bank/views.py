@@ -15,11 +15,11 @@ class GetBankBranches(generics.ListAPIView):
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
-        queryset = BankInformation.objects.all()
+        queryset = []
         bank_name = self.request.query_params.get('bank_name', '')
         city = self.request.query_params.get('city', '')
         if bank_name and city:
-            queryset = queryset.filter(
+            queryset = BankInformation.objects.filter(
                 bank_name__iexact=bank_name,
                 city__iexact=city
             )
